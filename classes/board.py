@@ -13,7 +13,6 @@ class Board:
         self.players = []
         self.current_turn = 0
 
-
     def get_current_turn(self):
         self.current_turn = (self.current_turn + 1) % len(self.players)
         return self.current_turn
@@ -34,14 +33,13 @@ class Board:
             move = (move + 1) % len(self.board[self.current_turn].pits)
             if move == 0:
                 self.board[self.current_turn].store.value.append(Seed())
-            # if move 
+            # if move
 
             self.board[self.current_turn].pits[move].value.append(Seed())
 
-
     def start_game(self):
         self.initialize_players()
-        # self.initialize_seeds()
+        self.initialize_seeds()
 
     def initialize_players(self):
         for name in PLAYERS_NAMES:
@@ -49,13 +47,13 @@ class Board:
             for _ in range(6):
                 pit = Pit(player)
                 self.board.append(pit)
-            
+
             store = Store(player)
             self.board.append(store)
 
     def initialize_seeds(self):
-        for cluster in self.board:
-            for pit in cluster.pits:
+        for pit in self.board:
+            if not pit.is_store():
                 pit.value = [Seed() for _ in range(4)]
 
     def __str__(self):
@@ -67,4 +65,3 @@ class Board:
         # board_string += f'{self.board[1]}'
 
         return board_string
-
