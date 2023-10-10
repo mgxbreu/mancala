@@ -24,11 +24,11 @@ class Board:
         first_half = self.board[:7]
         second_half = self.board[7:]
 
-        self.board = second_half + first_half
+        return second_half + first_half
 
     def change_turn(self):
         self.get_next_turn()
-        self.change_board_perspective()
+        self.board = self.change_board_perspective()
 
     def is_game_over(self):
         if all([len(pit.value) == 0 for pit in self.cluster_1]):
@@ -49,6 +49,7 @@ class Board:
             self.decide_winner()
 
         return self.winner
+
     def pick_and_sow_remaining_seeds(self):
         remaining_seeds_cluster = [
             pit for pit in self.board if pit.player is not self.game_finisher
@@ -72,6 +73,29 @@ class Board:
         if self.players[0].score > self.players[1].score:
             self.winner = self.players[0]
 
+    def was_my_last_pit_empty(self, last_pit_sowed):
+        return len(last_pit_sowed.value) == 1 and not last_pit_sowed.is_store()
+
+    def capture_seeds(self, last_pit_sowed, move):
+        if last_pit_sowed.player == self.players[0]:
+            move += 1
+            print('hi')
+        last_pit_sowed_index = self.board.index(last_pit_sowed)
+        self.pick(last_pit_sowed_index)
+
+        inverted_board = self.change_board_perspective()
+        opposite_last_pit = inverted_board[move]
+
+        opposite_last_pit_index = self.board.index(opposite_last_pit)
+        # seed from last_pit_sowed
+        seeds_on_pit = self.pick(opposite_last_pit_index) + 1
+
+        if seeds_on_pit == 0:
+            return
+        current_store = list(filter(lambda pit: pit.is_store() and pit.player == self.players[self.current_turn],
+                                    self.board))[0]
+        current_store.value.extend(list(Seed() for _ in range(seeds_on_pit)))
+
     def make_a_move(self, move):
         move = int(move)
         # Number has to be 0-5
@@ -80,11 +104,14 @@ class Board:
             print('Invalid move')
             return None
         last_pit_sowed = self.sow(move, seeds_on_pit)
+
+        if self.was_my_last_pit_empty(last_pit_sowed):
+            self.capture_seeds(last_pit_sowed, move)
+
         if not self.is_extra_turn(last_pit_sowed):
             self.change_turn()
         else:
             print('Extra turn')
-        return last_pit_sowed
 
     def pick(self, move):
         current_pit = self.board[move]
@@ -133,14 +160,8 @@ class Board:
     def initialize_seeds(self):
         for pit in self.board:
             if not pit.is_store():
-                pit.value = [Seed() for _ in range(1)]
+                pit.value = [Seed() for _ in range(4)]
 
     def __str__(self):
         board_string = f'{self.board}\n'
-        # board_string += f'\t{self.board[0].pits}\n'
-        # board_string += f'\t\t\t\t\t\t\t\t\t\t\t\t{self.board[1].store}\n'
-        # board_string += f'\t{self.board[1].pits}'
-        # board_string = f'{self.board[0].store} {self.board[0].pits[::-1]}\n'
-        # board_string += f'{self.board[1]}'
-
         return board_string
