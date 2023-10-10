@@ -46,8 +46,15 @@ class Board:
         move = int(move)
         # Number has to be 0-5
         seeds_on_pit = self.pick(move)
-        self.sow(move, seeds_on_pit)
-        self.change_turn()
+        if seeds_on_pit == 0:
+            print('Invalid move')
+            return None
+        last_pit_sowed = self.sow(move, seeds_on_pit)
+        if not self.is_extra_turn(last_pit_sowed):
+            self.change_turn()
+        else:
+            print('Extra turn')
+        return last_pit_sowed
 
     def pick(self, move):
         current_pit = self.board[move]
@@ -56,6 +63,7 @@ class Board:
         return seeds_on_pit
 
     def sow(self, move, seeds_to_sow):
+        pit_to_sow_in = None
         while seeds_to_sow > 0:
             move = (move + 1) % len(self.board)
             pit_to_sow_in = self.board[move]
@@ -64,6 +72,10 @@ class Board:
             if not enemy_store:
                 pit_to_sow_in.value.append(Seed())
                 seeds_to_sow -= 1
+        return pit_to_sow_in
+
+    def is_extra_turn(self, last_pit_sowed):
+        return last_pit_sowed.is_store() and last_pit_sowed.player is self.players[self.current_turn]
 
     def start_game(self):
         self.initialize_players()
