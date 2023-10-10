@@ -1,6 +1,8 @@
 from consts import PLAYERS_NAMES
 from classes.player import Player
-from classes.cluster import Cluster
+# from classes.cluster import Cluster
+from classes.pit import Pit
+from classes.store import Store
 from classes.seed import Seed
 
 
@@ -10,6 +12,7 @@ class Board:
         self.winner = None
         self.players = []
         self.current_turn = 0
+
 
     def get_current_turn(self):
         self.current_turn = (self.current_turn + 1) % len(self.players)
@@ -26,21 +29,29 @@ class Board:
         current_pit[move].value = []
         return seeds_on_pit
 
-    # def sow(self, move, seeds_on_pit):
-    #     for _ in range(seeds_on_pit):
-        # move = (move + 1) % len(self.board[self.current_turn].pits)
-        # self.board[self.current_turn].pits[move].value.append(Seed())
+    def sow(self, move, seeds_on_pit):
+        for _ in range(seeds_on_pit):
+            move = (move + 1) % len(self.board[self.current_turn].pits)
+            if move == 0:
+                self.board[self.current_turn].store.value.append(Seed())
+            # if move 
+
+            self.board[self.current_turn].pits[move].value.append(Seed())
+
 
     def start_game(self):
         self.initialize_players()
-        self.initialize_seeds()
+        # self.initialize_seeds()
 
     def initialize_players(self):
         for name in PLAYERS_NAMES:
             player = Player(name)
-            cluster = Cluster(player)
-            self.board.append(cluster)
-            self.players.append(player)
+            for _ in range(6):
+                pit = Pit(player)
+                self.board.append(pit)
+            
+            store = Store(player)
+            self.board.append(store)
 
     def initialize_seeds(self):
         for cluster in self.board:
@@ -48,9 +59,12 @@ class Board:
                 pit.value = [Seed() for _ in range(4)]
 
     def __str__(self):
-        board_string = f'{self.board[0].store}\n'
-        board_string += f'\t{self.board[0].pits}\n'
-        board_string += f'\t\t\t\t\t\t\t\t\t\t\t\t{self.board[1].store}\n'
-        board_string += f'\t{self.board[1].pits[::-1]}'
+        board_string = f'{self.board}\n'
+        # board_string += f'\t{self.board[0].pits}\n'
+        # board_string += f'\t\t\t\t\t\t\t\t\t\t\t\t{self.board[1].store}\n'
+        # board_string += f'\t{self.board[1].pits}'
+        # board_string = f'{self.board[0].store} {self.board[0].pits[::-1]}\n'
+        # board_string += f'{self.board[1]}'
 
         return board_string
+

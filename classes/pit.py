@@ -1,5 +1,6 @@
 class Pit:
-    def __init__(self):
+    def __init__(self, player):
+        self.player = player
         self.value = []
 
     def __str__(self):
