@@ -59,8 +59,11 @@ class Board:
         while seeds_to_sow > 0:
             move = (move + 1) % len(self.board)
             pit_to_sow_in = self.board[move]
-            pit_to_sow_in.value.append(Seed())
-            seeds_to_sow -= 1
+            enemy_store = pit_to_sow_in.is_store(
+            ) and pit_to_sow_in.player is not self.players[self.current_turn]
+            if not enemy_store:
+                pit_to_sow_in.value.append(Seed())
+                seeds_to_sow -= 1
 
     def start_game(self):
         self.initialize_players()
