@@ -19,13 +19,14 @@ class Board:
 
     def make_a_move(self, move):
         move = int(move)
+        # Number has to be 0-5
         seeds_on_pit = self.pick(move)
-        self.sow(move, seeds_on_pit)
+        # self.sow(move, seeds_on_pit)
 
     def pick(self, move):
-        current_pit = self.board[self.current_turn].pits
-        seeds_on_pit = len(current_pit[move].value)
-        current_pit[move].value = []
+        current_pit = self.board[move]
+        seeds_on_pit = len(current_pit.value)
+        current_pit.value = []
         return seeds_on_pit
 
     def sow(self, move, seeds_on_pit):
