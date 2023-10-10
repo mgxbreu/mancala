@@ -13,15 +13,27 @@ class Board:
         self.players = []
         self.current_turn = 0
 
-    def get_current_turn(self):
-        self.current_turn = (self.current_turn + 1) % len(self.players)
+    def get_next_turn(self):
+        self.current_turn += 1
+        if self.current_turn >= len(self.players): self.current_turn = 0
         return self.current_turn
+
+    def change_board_perspective(self):
+        first_half = self.board[:7]
+        second_half = self.board[7:]
+
+        self.board = second_half + first_half 
+
+    def change_turn(self):
+        self.get_next_turn()
+        self.change_board_perspective()
 
     def make_a_move(self, move):
         move = int(move)
         # Number has to be 0-5
         seeds_on_pit = self.pick(move)
         self.sow(move, seeds_on_pit)
+        self.change_turn()
 
     def pick(self, move):
         current_pit = self.board[move]
