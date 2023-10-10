@@ -15,18 +15,32 @@ class Board:
 
     def get_next_turn(self):
         self.current_turn += 1
-        if self.current_turn >= len(self.players): self.current_turn = 0
+        if self.current_turn >= len(self.players):
+            self.current_turn = 0
         return self.current_turn
 
     def change_board_perspective(self):
         first_half = self.board[:7]
         second_half = self.board[7:]
 
-        self.board = second_half + first_half 
+        self.board = second_half + first_half
 
     def change_turn(self):
         self.get_next_turn()
         self.change_board_perspective()
+
+    def check_for_winner(self):
+        cluster_1 = [
+            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[0] and not pit.is_store()]
+        cluster_2 = [
+            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[1] and not pit.is_store()]
+
+        if all([len(pit.value) == 0 for pit in cluster_1]):
+            self.winner = self.players[0]
+        elif all([len(pit.value) == 0 for pit in cluster_2]):
+            self.winner = self.players[1]
+
+        return self.winner
 
     def make_a_move(self, move):
         move = int(move)
@@ -61,6 +75,7 @@ class Board:
 
             store = Store(player)
             self.board.append(store)
+            self.players.append(player)
 
     def initialize_seeds(self):
         for pit in self.board:
