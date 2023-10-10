@@ -1,6 +1,5 @@
 from consts import PLAYERS_NAMES
 from classes.player import Player
-# from classes.cluster import Cluster
 from classes.pit import Pit
 from classes.store import Store
 from classes.seed import Seed
@@ -86,8 +85,8 @@ class Board:
         opposite_last_pit = inverted_board[move]
 
         opposite_last_pit_index = self.board.index(opposite_last_pit)
-        # seed from last_pit_sowed
-        seeds_on_pit = self.pick(opposite_last_pit_index) + 1
+        
+        seeds_on_pit = self.pick(opposite_last_pit_index) + 1 # seed from last_pit_sowed
 
         if seeds_on_pit == 0:
             return
@@ -97,10 +96,12 @@ class Board:
 
     def make_a_move(self, move):
         move = int(move)
-        # Number has to be 0-5
+        if move > 5 or move < 0 :
+            print('Invalid move. Number has to be 0-5')
+            return None
         seeds_on_pit = self.pick(move)
         if seeds_on_pit == 0:
-            print('Invalid move')
+            print('Invalid move. Pit must have seeds')
             return None
         last_pit_sowed = self.sow(move, seeds_on_pit)
 
