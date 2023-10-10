@@ -79,7 +79,6 @@ class Board:
     def capture_seeds(self, last_pit_sowed, move):
         if last_pit_sowed.player == self.players[0]:
             move += 1
-            print('hi')
         last_pit_sowed_index = self.board.index(last_pit_sowed)
         self.pick(last_pit_sowed_index)
 
