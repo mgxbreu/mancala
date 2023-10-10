@@ -15,6 +15,8 @@ def main():
         print(board)
         winner = board.get_winner()
     print(f"The winner is {winner}")
+    print(f"{board.players[0]} total point(s): {board.players[0].score}")
+    print(f"{board.players[1]} total point(s): {board.players[1].score}")
 
 
 main()

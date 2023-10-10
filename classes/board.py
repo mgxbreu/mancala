@@ -36,39 +36,36 @@ class Board:
         elif all([len(pit.value) == 0 for pit in self.cluster_2]):
             self.game_finisher = self.players[1]
 
-        store_1 = [
-            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[0] and pit.is_store()]
-        store_2 = [
-            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[1] and pit.is_store()]
-
         print(self.cluster_1, 'cluster 1')
         print(self.cluster_2, 'cluster 2')
-        print(store_1, 'store 1')
-        print(store_2, 'store 2')
+        print(len(self.store_1.value), 'store 1', self.store_1)
+        print(len(self.store_2.value), 'store 2', self.store_2)
 
     def get_winner(self):
         self.is_game_over()
         if self.game_finisher:
             self.pick_and_sow_remaining_seeds()
+            self.count_seeds()
 
         return self.game_finisher
 
     def pick_and_sow_remaining_seeds(self):
-        print('pick_and_sow_remaining_seeds')
         remaining_seeds_cluster = [
             pit for pit in self.board if pit.player is not self.game_finisher
         ]
 
         store_to_sow = list(filter(lambda pit: pit.is_store(),
-                              remaining_seeds_cluster))[0]
+                                   remaining_seeds_cluster))[0]
 
         remaining_seeds_cluster.remove(store_to_sow)
-        print(store_to_sow)
 
         for pit in remaining_seeds_cluster:
             store_to_sow.value.extend(pit.value)
             pit.value = []
-        print(store_to_sow)
+
+    def count_seeds(self):
+        self.players[0].score = len(self.store_1.value)
+        self.players[1].score = len(self.store_2.value)
 
     def make_a_move(self, move):
         move = int(move)
@@ -112,6 +109,10 @@ class Board:
             pit for pit in self.board if pit.player.name == PLAYERS_NAMES[0] and not pit.is_store()]
         self.cluster_2 = [
             pit for pit in self.board if pit.player.name == PLAYERS_NAMES[1] and not pit.is_store()]
+        self.store_1 = [
+            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[0] and pit.is_store()][0]
+        self.store_2 = [
+            pit for pit in self.board if pit.player.name == PLAYERS_NAMES[1] and pit.is_store()][0]
 
     def initialize_players(self):
         for name in PLAYERS_NAMES:
