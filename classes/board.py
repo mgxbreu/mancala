@@ -46,9 +46,9 @@ class Board:
         if self.game_finisher:
             self.pick_and_sow_remaining_seeds()
             self.count_seeds()
+            self.decide_winner()
 
-        return self.game_finisher
-
+        return self.winner
     def pick_and_sow_remaining_seeds(self):
         remaining_seeds_cluster = [
             pit for pit in self.board if pit.player is not self.game_finisher
@@ -66,6 +66,11 @@ class Board:
     def count_seeds(self):
         self.players[0].score = len(self.store_1.value)
         self.players[1].score = len(self.store_2.value)
+
+    def decide_winner(self):
+        self.winner = self.players[1]
+        if self.players[0].score > self.players[1].score:
+            self.winner = self.players[0]
 
     def make_a_move(self, move):
         move = int(move)
