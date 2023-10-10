@@ -21,7 +21,7 @@ class Board:
         move = int(move)
         # Number has to be 0-5
         seeds_on_pit = self.pick(move)
-        # self.sow(move, seeds_on_pit)
+        self.sow(move, seeds_on_pit)
 
     def pick(self, move):
         current_pit = self.board[move]
@@ -29,14 +29,12 @@ class Board:
         current_pit.value = []
         return seeds_on_pit
 
-    def sow(self, move, seeds_on_pit):
-        for _ in range(seeds_on_pit):
-            move = (move + 1) % len(self.board[self.current_turn].pits)
-            if move == 0:
-                self.board[self.current_turn].store.value.append(Seed())
-            # if move
-
-            self.board[self.current_turn].pits[move].value.append(Seed())
+    def sow(self, move, seeds_to_sow):
+        while seeds_to_sow > 0:
+            move = (move + 1) % len(self.board)
+            pit_to_sow_in = self.board[move]
+            pit_to_sow_in.value.append(Seed())
+            seeds_to_sow -= 1
 
     def start_game(self):
         self.initialize_players()
