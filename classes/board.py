@@ -3,14 +3,15 @@ from classes.player import Player
 from classes.pit import Pit
 from classes.store import Store
 from classes.seed import Seed
+from copy import deepcopy
 
 
 class Board:
-    def __init__(self):
-        self.board = []
+    def __init__(self, board=None, turn=None):
+        self.board = board if board is not None else []
         self.winner = None
         self.players = []
-        self.current_turn = 0
+        self.current_turn = turn if turn is not None else 0
         self.game_finisher = None
 
     def get_next_turn(self):
@@ -162,6 +163,21 @@ class Board:
             if not pit.is_store():
                 pit.value = [Seed() for _ in range(4)]
 
+    def children(self):
+        children = []
+        for move in range(6):
+            child = deepcopy(self)
+            child.make_a_move(move)
+            print(child)
+            print(move)
+            print()
+            print()
+            children.append(child)
+        return children
+
     def __str__(self):
-        board_string = f'{self.board}\n'
+        board_string = ""
+        board_string += f'\t|{self.board[7:13][::-1]}|\n'
+        board_string += f'{self.board[13]} \t|------------------|\t {self.board[6]}\n'
+        board_string += f'\t|{self.board[:6]}|\n'
         return board_string
