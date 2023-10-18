@@ -4,10 +4,10 @@ class Pit:
         self.value = []
 
     def __str__(self):
-        return f'{self.value}'
+        return f'{len(self.value)}'
 
     def __repr__(self):
-        return f'{self.value}'
+        return f'{len(self.value)}'
 
     def is_store(self):
         return False
