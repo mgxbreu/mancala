@@ -4,6 +4,8 @@ from classes.pit import Pit
 from classes.store import Store
 from classes.seed import Seed
 from copy import deepcopy
+import numpy as np
+
 
 
 class Board:
@@ -13,6 +15,7 @@ class Board:
         self.players = []
         self.current_turn = turn if turn is not None else 0
         self.game_finisher = None
+        self.last_player_to_play = None
 
     def get_next_turn(self):
         self.current_turn += 1
@@ -33,13 +36,11 @@ class Board:
     def is_game_over(self):
         if all([len(pit.value) == 0 for pit in self.cluster_1]):
             self.game_finisher = self.players[0]
+            return True
         elif all([len(pit.value) == 0 for pit in self.cluster_2]):
             self.game_finisher = self.players[1]
-
-        print(self.cluster_1, 'cluster 1')
-        print(self.cluster_2, 'cluster 2')
-        print(len(self.store_1.value), 'store 1', self.store_1)
-        print(len(self.store_2.value), 'store 2', self.store_2)
+            return True
+        return False
 
     def get_winner(self):
         self.is_game_over()
@@ -86,8 +87,9 @@ class Board:
         opposite_last_pit = inverted_board[move]
 
         opposite_last_pit_index = self.board.index(opposite_last_pit)
-        
-        seeds_on_pit = self.pick(opposite_last_pit_index) + 1 # seed from last_pit_sowed
+
+        # seed from last_pit_sowed
+        seeds_on_pit = self.pick(opposite_last_pit_index) + 1
 
         if seeds_on_pit == 0:
             return
@@ -96,23 +98,28 @@ class Board:
         current_store.value.extend(list(Seed() for _ in range(seeds_on_pit)))
 
     def make_a_move(self, move):
+        extra_turn = False
         move = int(move)
-        if move > 5 or move < 0 :
+        if move > 5 or move < 0:
             print('Invalid move. Number has to be 0-5')
-            return None
+            return (None, extra_turn)
         seeds_on_pit = self.pick(move)
         if seeds_on_pit == 0:
             print('Invalid move. Pit must have seeds')
-            return None
+            return (None, extra_turn)
         last_pit_sowed = self.sow(move, seeds_on_pit)
 
-        if self.was_my_last_pit_empty(last_pit_sowed):
-            self.capture_seeds(last_pit_sowed, move)
+        # if self.was_my_last_pit_empty(last_pit_sowed):
+        #     self.capture_seeds(last_pit_sowed, move)
 
+        self.last_player_to_play = self.players[self.current_turn]
         if not self.is_extra_turn(last_pit_sowed):
             self.change_turn()
         else:
             print('Extra turn')
+            extra_turn = True
+            
+        return last_pit_sowed, extra_turn
 
     def pick(self, move):
         current_pit = self.board[move]
@@ -167,13 +174,32 @@ class Board:
         children = []
         for move in range(6):
             child = deepcopy(self)
-            child.make_a_move(move)
-            print(child)
-            print(move)
-            print()
-            print()
-            children.append(child)
+            last_pit_sowed, extra_turn = child.make_a_move(move)
+            if last_pit_sowed:
+                children.append((child, extra_turn))
         return children
+    
+    def get_cluster_points(self, turn):
+        if turn == 0:
+            cluster_seeds = sum([len(x.value) for x in self.cluster_1 ]) 
+            store_seeds = len(self.store_1.value)
+            return cluster_seeds + store_seeds
+        else:
+            cluster_seeds = sum([len(x.value) for x in self.cluster_2 ]) 
+            store_seeds = len(self.store_2.value)
+            return cluster_seeds + store_seeds
+
+    
+    def heuristic(self):
+        return  len(self.store_2.value) - len(self.store_1.value)
+    
+    def evaluate(self):
+        self.get_winner()
+        if self.winner:
+            if self.winner == self.last_player_to_play:
+                return 1 * np.inf
+            else:
+                return -1 * np.inf
 
     def __str__(self):
         board_string = ""

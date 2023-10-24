@@ -21,11 +21,13 @@ class MinimaxSolver():
 
         if depth >= self.max_depth:
             return (None, state.heuristic())
-
         max_child, max_utility = (None, -np.inf)
 
-        for child in state.children():
-            _, utility = self.__minimize(child, alpha, beta, depth + 1)
+        for child, extra_turn in state.children():
+            if extra_turn:
+                _, utility = self.__maximize(child, alpha, beta, depth + 1)
+            else:
+                _, utility = self.__minimize(child, alpha, beta, depth + 1)
             if utility > max_utility:
                 max_child, max_utility = child, utility
 
@@ -47,12 +49,13 @@ class MinimaxSolver():
 
         if depth >= self.max_depth:
             return (None, state.heuristic())
-
         min_child, min_utility = (None, np.inf)
 
-        for child in state.children():
-
-            _, utility = self.__maximize(child, alpha, beta, depth + 1)
+        for child, extra_turn in state.children():
+            if extra_turn:
+                _, utility = self.__minimize(child, alpha, beta, depth + 1)
+            else:
+                _, utility = self.__maximize(child, alpha, beta, depth + 1)
             if utility < min_utility:
                 min_child, min_utility = child, utility
 
